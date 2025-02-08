@@ -1,0 +1,53 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String       @id @default(uuid())
+  email        String       @db.VarChar(50)
+  password     String       @db.VarChar(255)
+  created_at   DateTime     @db.Timestamptz()
+  updated_at   DateTime     @db.Timestamptz()
+  user_profile UserProfile?
+  mood_entries MoodEntry[]
+
+  @@index([email])
+  @@map("users")
+}
+
+model UserProfile {
+  id           String   @id @default(uuid())
+  name         String   @db.VarChar(255)
+  avatar_url   String   @db.Text
+  user         User     @relation(fields: [user_id], references: [id])
+  is_onboarded Boolean  @default(false) @db.Boolean
+  user_id      String   @unique
+  created_at   DateTime @db.Timestamptz()
+  updated_at   DateTime @db.Timestamptz()
+
+  @@map("user_profiles")
+}
+
+model MoodEntry {
+  id         String   @id @default(uuid())
+  mood_score Int      @db.SmallInt
+  note       String   @db.Text
+  tags       String[] @db.Text
+  user_id    String
+  user       User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  created_at DateTime @db.Timestamptz()
+  updated_at DateTime @db.Timestamptz()
+
+  @@map("mood_entries")
+}
