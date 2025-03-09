@@ -40,14 +40,28 @@ model UserProfile {
 }
 
 model MoodEntry {
-  id         String   @id @default(uuid())
-  mood_score Int      @db.SmallInt
-  note       String   @db.Text
-  tags       String[] @db.Text
-  user_id    String
-  user       User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
-  created_at DateTime @db.Timestamptz()
-  updated_at DateTime @db.Timestamptz()
+  id                  String              @id @default(uuid())
+  mood_score          Int                 @db.SmallInt
+  note                String              @db.Text
+  tags                String[]            @db.Text
+  user_id             String
+  user                User                @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  created_at          DateTime            @db.Timestamptz()
+  updated_at          DateTime            @db.Timestamptz()
+  mood_entry_analysis MoodEntryAnalysis[]
 
   @@map("mood_entries")
+}
+
+model MoodEntryAnalysis {
+  id            String    @id @default(uuid())
+  mood_entry_id String
+  sentiment     String    @db.Text
+  themes        String[]  @db.Text
+  insigt        String    @db.Text
+  created_at    DateTime  @db.Timestamptz()
+  updated_at    DateTime  @db.Timestamptz()
+  mood_entry    MoodEntry @relation(fields: [mood_entry_id], references: [id])
+
+  @@map("mood_entry_analysis")
 }
